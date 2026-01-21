@@ -9,12 +9,12 @@
 #   ansible-galaxy collection install -r collections/requirements.yml --force
 # =============================================================================
 
-collections:
-  # Colección principal de NetBackup (inditex.netbackup)
-  # Contiene roles: client, _shared, cyberark, policy_manager, restart
-  - name: https://github.com/inditex/iac-netbackupclient.git
-    type: git
-    version: tower-dev  # Cambiar a main o tag específico (v1.0.0) en producción
+# collections:
+#   # Colección principal de NetBackup (inditex.netbackup)
+#   # Contiene roles: client, _shared, cyberark, policy_manager, restart
+#   - name: https://github.com/inditex/iac-netbackupclient.git
+#     type: git
+#     version: tower-dev  # Cambiar a main o tag específico (v1.0.0) en producción
 
   # Dependencias estándar de Ansible
   - name: ansible.posix
