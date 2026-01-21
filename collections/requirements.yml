@@ -12,7 +12,7 @@
 collections:
   # Colección principal de NetBackup (inditex.netbackup)
   # Contiene roles: client, _shared, cyberark, policy_manager, restart
-  - name: git@github.com:inditex/iac-netbackupclient.git
+  - name: https://github.com/inditex/iac-netbackupclient.git
     type: git
     version: tower-dev  # Cambiar a main o tag específico (v1.0.0) en producción
 
