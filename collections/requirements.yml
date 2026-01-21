@@ -1,0 +1,24 @@
+---
+# =============================================================================
+# ANSIBLE COLLECTION REQUIREMENTS - NETBACKUP PLAYBOOKS
+# =============================================================================
+# Este archivo define las colecciones necesarias para ejecutar los playbooks
+# de NetBackup. AAP/Tower lo usa automáticamente para instalar dependencias.
+#
+# Instalación manual:
+#   ansible-galaxy collection install -r collections/requirements.yml --force
+# =============================================================================
+
+collections:
+  # Colección principal de NetBackup (inditex.netbackup)
+  # Contiene roles: client, _shared, cyberark, policy_manager, restart
+  - name: git@github.com:inditex/iac-netbackupclient.git
+    type: git
+    version: tower-dev  # Cambiar a main o tag específico (v1.0.0) en producción
+
+  # Dependencias estándar de Ansible
+  - name: ansible.posix
+    version: ">=1.4.0"
+
+  - name: community.general
+    version: ">=6.0.0"

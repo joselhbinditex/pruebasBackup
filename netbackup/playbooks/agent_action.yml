@@ -1,0 +1,94 @@
+---
+# ============================================================================
+# NETBACKUP SERVICE ACTION PLAYBOOK
+# ============================================================================
+# Purpose: Execute NetBackup service actions (stop/start/restart/status)
+# Usage:
+#   ansible-playbook playbooks/agent_action.yml \
+#     -e "nbu_client__client_name=hostname" \
+#     -e "action=restart"
+#
+# Required Variables:
+#   nbu_client__client_name: Client hostname
+#   action: Action to execute (status/restart/stop/start)
+#
+# Notes:
+#   - This playbook uses the inditex.netbackup.restart role
+#   - Action validation is performed by the role itself
+# ============================================================================
+
+- name: Agent Action | Validation | Add host to inventory
+  hosts: all
+  become: false
+  gather_facts: false
+
+  collections:
+    - inditex.netbackup
+
+  pre_tasks:
+    - name: Agent Action | Validation | Display execution info
+      ansible.builtin.debug:
+        msg:
+          - "======================================================="
+          - "   NETBACKUP SERVICE ACTION - EXECUTION START"
+          - "======================================================="
+          - "Target Host: {{ nbu_client__client_name | default('UNDEFINED') }}"
+          - "Action: {{ action | default('UNDEFINED') | upper }}"
+          - "======================================================="
+
+    - name: Agent Action | Validation | Ensure mandatory variables are defined
+      ansible.builtin.assert:
+        that:
+          - vars[item] is defined
+          - vars[item] is not none
+          - vars[item] | length > 0
+        fail_msg:
+          - "ERROR: Variable '{{ item }}' is not defined or is empty"
+          - "Required variables: nbu_client__client_name, action"
+      loop:
+        - nbu_client__client_name
+        - action
+
+  tasks:
+    - name: Agent Action | Validation | Add host to netbackup_action group
+      ansible.builtin.add_host:
+        name: "{{ nbu_client__client_name }}"
+        group: netbackup_action
+
+- name: Agent Action | Execution | Execute NetBackup Service Action
+  hosts: netbackup_action
+  become: true
+  gather_facts: true
+
+  collections:
+    - inditex.netbackup
+
+  pre_tasks:
+    - name: Agent Action | Execution | Display system information
+      ansible.builtin.debug:
+        msg:
+          - "======================================================="
+          - "   TARGET SYSTEM INFORMATION"
+          - "======================================================="
+          - "Hostname: {{ inventory_hostname }}"
+          - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Ansible Version: {{ ansible_version.full }}"
+          - "Action Requested: {{ action | upper }}"
+          - "======================================================="
+
+  roles:
+    - role: inditex.netbackup.restart
+      vars:
+        nbu_restart__action: "{{ action }}"
+
+  post_tasks:
+    - name: Agent Action | Execution | Display completion status
+      ansible.builtin.debug:
+        msg:
+          - "======================================================="
+          - "   ACTION COMPLETED SUCCESSFULLY"
+          - "======================================================="
+          - "Action Executed: {{ action | upper }}"
+          - "Host: {{ inventory_hostname }}"
+          - "Timestamp: {{ ansible_date_time.iso8601 }}"
+          - "======================================================="

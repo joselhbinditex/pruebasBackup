@@ -1,0 +1,65 @@
+---
+# ============================================================================
+# NETBACKUP CLIENT INSTALLATION PLAYBOOK
+# ============================================================================
+# Purpose: Install and configure NetBackup client on target hosts
+# Location: netbackup/playbooks/install_client.yml
+#
+# Usage:
+#   ansible-playbook -i inventory playbooks/install_client.yml -l hostname
+#   ansible-playbook -i inventory playbooks/install_client.yml -l hostname \
+#     -e nbu_client__master_server_fqdn=master.example.com
+#
+# Required Variables:
+#   - nbu_client__master_server_fqdn: Master server FQDN
+#   - nbu_client__client_name: Client hostname (defaults to inventory_hostname)
+# ============================================================================
+
+- name: "NetBackup Client Installation"
+  hosts: all
+  gather_facts: true
+  become: true
+
+  collections:
+    - inditex.netbackup
+
+  pre_tasks:
+    - name: "Install | Pre-check | Display installation banner"
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "           NETBACKUP CLIENT INSTALLATION"
+          - "============================================================"
+          - "  Target Host: {{ inventory_hostname }}"
+          - "  Master Server: {{ nbu_client__master_server_fqdn | default('NOT DEFINED') }}"
+          - "  Client Name: {{ nbu_client__client_name | default(inventory_hostname) }}"
+          - "============================================================"
+
+    - name: "Install | Pre-check | Validate required variables"
+      ansible.builtin.assert:
+        that:
+          - nbu_client__master_server_fqdn is defined
+          - nbu_client__master_server_fqdn | length > 0
+        fail_msg:
+          - "INSTALLATION ABORTED: nbu_client__master_server_fqdn is not defined"
+          - "Please set the master server FQDN in inventory or via extra vars:"
+          - "  -e nbu_client__master_server_fqdn=master.example.com"
+
+  roles:
+    - role: inditex.netbackup.client
+      vars:
+        nbu_client__client_name: "{{ nbu_client__client_name | default(inventory_hostname) }}"
+
+  post_tasks:
+    - name: "Install | Post-check | Display installation result"
+      ansible.builtin.debug:
+        msg:
+          - "========== INSTALLATION COMPLETE =========="
+          - "Host: {{ inventory_hostname }}"
+          - "Master Server: {{ nbu_client__master_server_fqdn }}"
+          - "Client Name: {{ nbu_client__client_name | default(inventory_hostname) }}"
+          - "==========================================="
+
+# ============================================================================
+# END OF PLAYBOOK
+# ============================================================================

@@ -1,0 +1,50 @@
+---
+# ============================================================================
+# NETBACKUP CLIENT UNINSTALLATION PLAYBOOK
+# ============================================================================
+# Purpose: Complete removal of NetBackup client for testing/cleanup purposes
+# Location: netbackup/playbooks/uninstall_client.yml
+#
+# Usage:
+#   ansible-playbook -i inventory playbooks/uninstall_client.yml -l hostname
+#
+# WARNING: This will completely remove NetBackup client and all its data!
+# ============================================================================
+
+- name: "NetBackup Client Uninstallation"
+  hosts: all
+  gather_facts: true
+  become: true
+
+  collections:
+    - inditex.netbackup
+
+  pre_tasks:
+    - name: "Uninstall | Pre-check | Display uninstallation banner"
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "           NETBACKUP CLIENT UNINSTALLATION"
+          - "============================================================"
+          - "  Target Host: {{ inventory_hostname }}"
+          - "  WARNING: This will completely remove NetBackup client!"
+          - "============================================================"
+
+  tasks:
+    - name: "Uninstall | Include uninstallation tasks"
+      ansible.builtin.include_role:
+        name: inditex.netbackup.client
+        tasks_from: uninstall.yml
+
+  post_tasks:
+    - name: "Uninstall | Post-check | Display uninstallation result"
+      ansible.builtin.debug:
+        msg:
+          - "========== UNINSTALLATION COMPLETE =========="
+          - "Host: {{ inventory_hostname }}"
+          - "NetBackup client has been removed"
+          - "============================================="
+
+# ============================================================================
+# END OF PLAYBOOK
+# ============================================================================

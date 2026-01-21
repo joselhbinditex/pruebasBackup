@@ -1,0 +1,28 @@
+---
+# =============================================================================
+# INVENTORY EXAMPLE - NETBACKUP PLAYBOOKS
+# =============================================================================
+# Copiar a hosts.yml y ajustar según el entorno
+# =============================================================================
+
+all:
+  children:
+    # Grupo por master server
+    netbackup_preprod:
+      vars:
+        nbu_client__master_server_fqdn: axpreprubckmst.central.inditex.grp
+      hosts:
+        server1.example.com:
+        server2.example.com:
+
+    netbackup_prod:
+      vars:
+        nbu_client__master_server_fqdn: apsgecbckmst.central.inditex.grp
+      hosts:
+        server3.example.com:
+        server4.example.com:
+
+  vars:
+    # Variables globales para todos los hosts
+    ansible_user: ansible
+    ansible_become: true

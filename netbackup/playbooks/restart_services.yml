@@ -1,0 +1,44 @@
+---
+# ============================================================================
+# NETBACKUP SERVICES RESTART PLAYBOOK
+# ============================================================================
+# Purpose: Restart NetBackup client services
+# Location: netbackup/playbooks/restart_services.yml
+#
+# Usage:
+#   ansible-playbook -i inventory playbooks/restart_services.yml -l hostname
+# ============================================================================
+
+- name: "NetBackup Services Restart"
+  hosts: all
+  gather_facts: true
+  become: true
+
+  collections:
+    - inditex.netbackup
+
+  pre_tasks:
+    - name: "Restart | Pre-check | Display restart banner"
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "           NETBACKUP SERVICES RESTART"
+          - "============================================================"
+          - "  Target Host: {{ inventory_hostname }}"
+          - "============================================================"
+
+  roles:
+    - role: inditex.netbackup.restart
+
+  post_tasks:
+    - name: "Restart | Post-check | Display restart result"
+      ansible.builtin.debug:
+        msg:
+          - "========== RESTART COMPLETE =========="
+          - "Host: {{ inventory_hostname }}"
+          - "NetBackup services have been restarted"
+          - "======================================"
+
+# ============================================================================
+# END OF PLAYBOOK
+# ============================================================================
