@@ -1,0 +1,66 @@
+---
+# ============================================================================
+# NETBACKUP POLICY MANAGER TEST PLAYBOOK
+# ============================================================================
+# Purpose: Test policy manager role adding a backup path
+# Location: playbooks/test_policy_manager.yml
+#
+# Usage:
+#   ansible-playbook playbooks/test_policy_manager.yml \
+#     -e "vserver=svm_DES1" \
+#     -e "volname=PEPITO"
+#
+# This will:
+#   - Use SVM mapping to resolve master server and policy
+#   - Add /svm_DES1/PEPITO to the policy backup selections
+# ============================================================================
+
+- name: "NetBackup Policy Manager Test"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - inditex.netbackup
+
+  vars:
+    # Test variables - override with -e
+    vserver: "svm_DES1"
+    volname: "PEPITO"
+    cyberark_appid: "AppBucketBCK"
+
+  pre_tasks:
+    - name: "Test | Display test banner"
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "        NETBACKUP POLICY MANAGER TEST"
+          - "============================================================"
+          - "  SVM (vserver): {{ vserver }}"
+          - "  Volume Name: {{ volname }}"
+          - "  Backup Path: /{{ vserver }}/{{ volname }}"
+          - "  CyberArk AppID: {{ cyberark_appid }}"
+          - "============================================================"
+
+  roles:
+    - role: inditex.netbackup.policy_manager
+      vars:
+        nbu_policy__svm_name: "{{ vserver }}"
+        nbu_policy__backup_path: "/{{ vserver }}/{{ volname }}"
+        nbu_policy__action: "add"
+        nbu_policy__verbose_logging: true
+
+  post_tasks:
+    - name: "Test | Display test result"
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "        TEST COMPLETED"
+          - "============================================================"
+          - "  SVM: {{ vserver }}"
+          - "  Path Added: /{{ vserver }}/{{ volname }}"
+          - "============================================================"
+
+# ============================================================================
+# END OF PLAYBOOK
+# ============================================================================
